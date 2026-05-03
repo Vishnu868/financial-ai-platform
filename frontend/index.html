@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Financial Document AI Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ━━━━━━━━━━━━━━━━━━━ RESET & VARIABLES ━━━━━━━━━━━━━━━━━━━ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg-primary: #0a0e17;
+  --bg-secondary: #111827;
+  --bg-card: #1a2235;
+  --bg-card-hover: #1f2a40;
+  --bg-input: #0d1321;
+  --border: #2a3550;
+  --border-focus: #3b82f6;
+  --text-primary: #e8edf5;
+  --text-secondary: #8896b0;
+  --text-muted: #5a6a85;
+  --accent: #3b82f6;
+  --accent-glow: rgba(59, 130, 246, 0.15);
+  --success: #10b981;
+  --success-bg: rgba(16, 185, 129, 0.1);
+  --warning: #f59e0b;
+  --warning-bg: rgba(245, 158, 11, 0.1);
+  --danger: #ef4444;
+  --danger-bg: rgba(239, 68, 68, 0.1);
+  --font-body: 'DM Sans', -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --radius: 10px;
+  --radius-sm: 6px;
+  --shadow: 0 4px 24px rgba(0,0,0,0.3);
+  --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━ LAYOUT ━━━━━━━━━━━━━━━━━━━ */
+.app-container {
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+header {
+  padding: 28px 0 20px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+header h1 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+header h1 span.logo-icon {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+}
+
+.api-status {
+  font-size: 0.82rem;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-weight: 500;
+  display: flex; align-items: center; gap: 6px;
+}
+.api-status.online { background: var(--success-bg); color: var(--success); border: 1px solid rgba(16,185,129,0.2); }
+.api-status.offline { background: var(--danger-bg); color: var(--danger); border: 1px solid rgba(239,68,68,0.2); }
+
+/* ━━━━━━━━━━━━━━━━━━━ TABS ━━━━━━━━━━━━━━━━━━━ */
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 28px;
+  background: var(--bg-secondary);
+  padding: 4px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+.tab-btn {
+  flex: 1;
+  padding: 10px 16px;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: var(--transition);
+}
+.tab-btn:hover { color: var(--text-primary); background: var(--bg-card); }
+.tab-btn.active {
+  background: var(--accent);
+  color: white;
+  box-shadow: 0 2px 8px rgba(59,130,246,0.3);
+}
+.tab-content { display: none; }
+.tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+/* ━━━━━━━━━━━━━━━━━━━ CARDS ━━━━━━━━━━━━━━━━━━━ */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 20px;
+  transition: var(--transition);
+}
+.card:hover { border-color: rgba(59,130,246,0.3); }
+
+.card-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+  display: flex; align-items: center; gap: 8px;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━ UPLOAD ZONE ━━━━━━━━━━━━━━━━━━━ */
+.upload-zone {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 48px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+.upload-zone:hover, .upload-zone.dragover {
+  border-color: var(--accent);
+  background: var(--accent-glow);
+}
+.upload-zone input[type="file"] {
+  position: absolute; inset: 0; opacity: 0; cursor: pointer;
+}
+.upload-zone .icon { font-size: 2.5rem; margin-bottom: 12px; display: block; }
+.upload-zone .label { font-weight: 600; font-size: 1rem; color: var(--text-primary); }
+.upload-zone .hint { font-size: 0.82rem; color: var(--text-muted); margin-top: 6px; }
+
+.file-preview {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 16px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+  margin-top: 12px;
+}
+.file-preview .name { font-weight: 500; flex: 1; }
+.file-preview .size { color: var(--text-muted); font-size: 0.82rem; }
+.file-preview .remove {
+  background: none; border: none; color: var(--danger); cursor: pointer;
+  font-size: 1.1rem; padding: 4px;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━ BUTTONS ━━━━━━━━━━━━━━━━━━━ */
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+  background: var(--bg-card);
+  color: var(--text-primary);
+}
+.btn:hover { border-color: var(--accent); background: var(--bg-card-hover); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+.btn-primary:hover { background: #2563eb; box-shadow: 0 2px 12px rgba(59,130,246,0.4); }
+.btn-primary:disabled { background: #1e40af; }
+
+.btn-full { width: 100%; justify-content: center; }
+.btn-sm { padding: 6px 14px; font-size: 0.82rem; }
+
+/* ━━━━━━━━━━━━━━━━━━━ METRICS ━━━━━━━━━━━━━━━━━━━ */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.metric {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  position: relative;
+  overflow: hidden;
+}
+.metric::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 3px; height: 100%;
+}
+.metric.blue::before { background: var(--accent); }
+.metric.green::before { background: var(--success); }
+.metric.yellow::before { background: var(--warning); }
+.metric.red::before { background: var(--danger); }
+
+.metric .label { font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.8px; font-weight: 500; }
+.metric .value { font-size: 1.3rem; font-weight: 700; margin-top: 4px; }
+
+/* ━━━━━━━━━━━━━━━━━━━ RESULT SECTIONS ━━━━━━━━━━━━━━━━━━━ */
+.result-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+@media (max-width: 768px) { .result-grid { grid-template-columns: 1fr; } }
+
+.field-group { margin-bottom: 20px; }
+.field-group h3 {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.field-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 7px 0;
+  border-bottom: 1px solid rgba(42,53,80,0.5);
+  font-size: 0.9rem;
+}
+.field-row .key { color: var(--text-secondary); }
+.field-row .val { font-weight: 500; text-align: right; }
+
+/* ━━━━━━━━━━━━━━━━━━━ WARNINGS ━━━━━━━━━━━━━━━━━━━ */
+.warning-list { display: flex; flex-direction: column; gap: 8px; margin: 16px 0; }
+.warning-item {
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  display: flex; align-items: flex-start; gap: 8px;
+}
+.warning-item.warn { background: var(--warning-bg); border: 1px solid rgba(245,158,11,0.2); color: var(--warning); }
+.warning-item.ok { background: var(--success-bg); border: 1px solid rgba(16,185,129,0.2); color: var(--success); }
+
+/* ━━━━━━━━━━━━━━━━━━━ COLLAPSIBLE ━━━━━━━━━━━━━━━━━━━ */
+.collapsible {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+.collapsible-header {
+  padding: 12px 16px;
+  background: var(--bg-secondary);
+  cursor: pointer;
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 0.88rem; font-weight: 500;
+  user-select: none;
+}
+.collapsible-header:hover { background: var(--bg-card-hover); }
+.collapsible-header .arrow { transition: var(--transition); }
+.collapsible-header.open .arrow { transform: rotate(180deg); }
+.collapsible-body {
+  max-height: 0; overflow: hidden; transition: max-height 0.35s ease;
+}
+.collapsible-body.open { max-height: 2000px; }
+.collapsible-body pre {
+  padding: 16px;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 400px;
+  overflow-y: auto;
+  background: var(--bg-input);
+}
+
+/* ━━━━━━━━━━━━━━━━━━━ TABLE ━━━━━━━━━━━━━━━━━━━ */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+.data-table th {
+  text-align: left;
+  padding: 10px 12px;
+  background: var(--bg-secondary);
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--border);
+}
+.data-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(42,53,80,0.4);
+}
+.data-table tr:hover td { background: var(--bg-card-hover); }
+
+/* ━━━━━━━━━━━━━━━━━━━ CHAT ━━━━━━━━━━━━━━━━━━━ */
+.chat-container {
+  display: flex; flex-direction: column;
+  height: 500px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.chat-msg {
+  max-width: 80%;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+.chat-msg.user {
+  align-self: flex-end;
+  background: var(--accent);
+  color: white;
+  border-bottom-right-radius: 2px;
+}
+.chat-msg.bot {
+  align-self: flex-start;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-bottom-left-radius: 2px;
+}
+.chat-input-bar {
+  display: flex; gap: 8px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--border);
+  background: var(--bg-secondary);
+}
+.chat-input-bar input {
+  flex: 1;
+  padding: 10px 14px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  outline: none;
+}
+.chat-input-bar input:focus { border-color: var(--accent); }
+
+/* ━━━━━━━━━━━━━━━━━━━ PROGRESS ━━━━━━━━━━━━━━━━━━━ */
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: var(--bg-secondary);
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 12px 0;
+}
+.progress-bar .fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), #8b5cf6);
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━ SPINNER ━━━━━━━━━━━━━━━━━━━ */
+.spinner {
+  display: inline-block;
+  width: 20px; height: 20px;
+  border: 2px solid rgba(255,255,255,0.2);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ━━━━━━━━━━━━━━━━━━━ RESPONSIVE ━━━━━━━━━━━━━━━━━━━ */
+@media (max-width: 640px) {
+  .tabs { flex-wrap: wrap; }
+  .tab-btn { flex: 1 1 45%; }
+  .metrics-grid { grid-template-columns: 1fr 1fr; }
+  header h1 { font-size: 1.2rem; }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+<div class="app-container">
+
+<!-- HEADER -->
+<header>
+  <h1>
+    <span class="logo-icon">📄</span>
+    Financial Document AI
+  </h1>
+  <div id="apiStatus" class="api-status offline">● Checking API...</div>
+</header>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('extract')">📄 Extract</button>
+  <button class="tab-btn" onclick="switchTab('batch')">📦 Batch</button>
+  <button class="tab-btn" onclick="switchTab('chat')">💬 Chat</button>
+  <button class="tab-btn" onclick="switchTab('history')">📋 History</button>
+</div>
+
+<!-- ━━━━━━━ TAB: EXTRACT ━━━━━━━ -->
+<div id="tab-extract" class="tab-content active">
+  <div style="display:grid; grid-template-columns: 380px 1fr; gap: 24px;">
+
+    <!-- LEFT: Upload -->
+    <div>
+      <div class="card">
+        <div class="card-title">📤 Upload Document</div>
+        <div class="upload-zone" id="uploadZone">
+          <input type="file" id="fileInput" accept=".pdf,.jpg,.jpeg,.png,.webp">
+          <span class="icon">📁</span>
+          <div class="label">Drop file here or click to browse</div>
+          <div class="hint">PDF, JPG, PNG, WebP — Max 20MB</div>
+        </div>
+        <div id="filePreview" style="display:none;"></div>
+        <button class="btn btn-primary btn-full" id="extractBtn" onclick="extractInvoice()" disabled style="margin-top:16px;">
+          🔍 Extract Data
+        </button>
+      </div>
+
+      <div class="card">
+        <div class="card-title">ℹ️ Supported Platforms</div>
+        <div style="display:flex; flex-wrap:wrap; gap:6px;">
+          <span class="btn btn-sm" style="cursor:default;">Amazon</span>
+          <span class="btn btn-sm" style="cursor:default;">Flipkart</span>
+          <span class="btn btn-sm" style="cursor:default;">Swiggy</span>
+          <span class="btn btn-sm" style="cursor:default;">Zomato</span>
+          <span class="btn btn-sm" style="cursor:default;">Meesho</span>
+          <span class="btn btn-sm" style="cursor:default;">Myntra</span>
+          <span class="btn btn-sm" style="cursor:default;">BigBasket</span>
+          <span class="btn btn-sm" style="cursor:default;">Blinkit</span>
+          <span class="btn btn-sm" style="cursor:default;">JioMart</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Results -->
+    <div id="resultArea">
+      <div class="card" id="emptyState" style="text-align:center; padding:64px 24px;">
+        <div style="font-size:3rem; margin-bottom:12px;">📄</div>
+        <div style="font-size:1.1rem; font-weight:600;">Upload a document to get started</div>
+        <div style="color:var(--text-muted); margin-top:6px;">Supports invoices and bank statements from 9 Indian platforms</div>
+      </div>
+      <div id="resultContent" style="display:none;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ━━━━━━━ TAB: BATCH ━━━━━━━ -->
+<div id="tab-batch" class="tab-content">
+  <div class="card">
+    <div class="card-title">📦 Batch Processing</div>
+    <p style="color:var(--text-secondary); margin-bottom:16px;">Upload a ZIP file containing multiple invoices (JPG/PNG/PDF). Max 20 files.</p>
+    <div class="upload-zone" id="batchUploadZone">
+      <input type="file" id="batchFileInput" accept=".zip">
+      <span class="icon">🗜️</span>
+      <div class="label">Drop ZIP file here or click to browse</div>
+      <div class="hint">.zip containing invoice images/PDFs</div>
+    </div>
+    <div id="batchFilePreview" style="display:none; margin-top:12px;"></div>
+    <button class="btn btn-primary btn-full" id="batchBtn" onclick="startBatch()" disabled style="margin-top:16px;">
+      🚀 Process Batch
+    </button>
+    <div id="batchProgress" style="display:none; margin-top:20px;"></div>
+    <div id="batchResults" style="margin-top:20px;"></div>
+  </div>
+</div>
+
+<!-- ━━━━━━━ TAB: CHAT ━━━━━━━ -->
+<div id="tab-chat" class="tab-content">
+  <div class="card" style="padding:0;">
+    <div style="padding:16px 20px; border-bottom:1px solid var(--border);">
+      <div class="card-title" style="margin:0;">💬 Ask About Your Document</div>
+      <div id="chatDocInfo" style="font-size:0.82rem; color:var(--text-muted); margin-top:4px;">Extract a document first to ask questions</div>
+    </div>
+    <div class="chat-container" style="border:none; border-radius:0;">
+      <div class="chat-messages" id="chatMessages">
+        <div class="chat-msg bot">Hi! Upload and extract a document first, then ask me anything about it.</div>
+      </div>
+      <div class="chat-input-bar">
+        <input type="text" id="chatInput" placeholder="Ask about the invoice..." onkeydown="if(event.key==='Enter')sendChat()">
+        <button class="btn btn-primary btn-sm" onclick="sendChat()">Send</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ━━━━━━━ TAB: HISTORY ━━━━━━━ -->
+<div id="tab-history" class="tab-content">
+  <div class="card">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+      <div class="card-title" style="margin:0;">📋 Extraction History</div>
+      <button class="btn btn-sm" onclick="downloadAllCSV()">📥 Download All CSV</button>
+    </div>
+    <div id="historyTable">
+      <p style="color:var(--text-muted); text-align:center; padding:32px;">No extractions yet. Upload a document to get started.</p>
+    </div>
+  </div>
+</div>
+
+</div> <!-- /app-container -->
+
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<!-- JAVASCRIPT -->
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<script>
+const API = 'http://localhost:8000';
+let selectedFile = null;
+let batchFile = null;
+let lastResult = null;
+let history = [];
+
+// ── API HEALTH CHECK ──────────────────────────────────────────────────
+async function checkAPI() {
+  const el = document.getElementById('apiStatus');
+  try {
+    const r = await fetch(`${API}/health`, { signal: AbortSignal.timeout(3000) });
+    if (r.ok) {
+      el.className = 'api-status online';
+      el.textContent = '● API Connected';
+    } else throw new Error();
+  } catch {
+    el.className = 'api-status offline';
+    el.textContent = '● API Offline';
+  }
+}
+checkAPI();
+setInterval(checkAPI, 15000);
+
+// ── TAB SWITCHING ─────────────────────────────────────────────────────
+function switchTab(name) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(`tab-${name}`).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ── FILE UPLOAD (SINGLE) ──────────────────────────────────────────────
+const fileInput = document.getElementById('fileInput');
+const uploadZone = document.getElementById('uploadZone');
+
+fileInput.addEventListener('change', (e) => {
+  selectedFile = e.target.files[0];
+  if (selectedFile) showFilePreview(selectedFile, 'filePreview');
+  document.getElementById('extractBtn').disabled = !selectedFile;
+});
+
+uploadZone.addEventListener('dragover', (e) => { e.preventDefault(); uploadZone.classList.add('dragover'); });
+uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
+uploadZone.addEventListener('drop', (e) => {
+  e.preventDefault();
+  uploadZone.classList.remove('dragover');
+  selectedFile = e.dataTransfer.files[0];
+  fileInput.files = e.dataTransfer.files;
+  showFilePreview(selectedFile, 'filePreview');
+  document.getElementById('extractBtn').disabled = false;
+});
+
+function showFilePreview(file, containerId) {
+  const container = document.getElementById(containerId);
+  container.style.display = 'block';
+  container.innerHTML = `
+    <div class="file-preview">
+      <span>📎</span>
+      <span class="name">${file.name}</span>
+      <span class="size">${(file.size / 1024).toFixed(0)} KB</span>
+      <button class="remove" onclick="clearFile('${containerId}')">&times;</button>
+    </div>
+  `;
+}
+
+function clearFile(containerId) {
+  if (containerId === 'filePreview') { selectedFile = null; fileInput.value = ''; document.getElementById('extractBtn').disabled = true; }
+  else { batchFile = null; document.getElementById('batchFileInput').value = ''; document.getElementById('batchBtn').disabled = true; }
+  document.getElementById(containerId).style.display = 'none';
+}
+
+// ── EXTRACT INVOICE ───────────────────────────────────────────────────
+async function extractInvoice() {
+  if (!selectedFile) return;
+
+  const btn = document.getElementById('extractBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Extracting...';
+
+  const formData = new FormData();
+  formData.append('file', selectedFile);
+
+  try {
+    const r = await fetch(`${API}/api/v2/invoice/extract`, { method: 'POST', body: formData });
+    const data = await r.json();
+
+    if (r.ok) {
+      lastResult = data;
+      history.push(data);
+      renderResult(data);
+      renderHistory();
+      updateChatInfo();
+    } else {
+      alert(`Error: ${data.detail || JSON.stringify(data)}`);
+    }
+  } catch (err) {
+    alert(`Failed to connect: ${err.message}\n\nMake sure FastAPI is running:\nuvicorn app.main:app --reload`);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '🔍 Extract Data';
+  }
+}
+
+// ── RENDER RESULT ─────────────────────────────────────────────────────
+function renderResult(data) {
+  document.getElementById('emptyState').style.display = 'none';
+  const el = document.getElementById('resultContent');
+  el.style.display = 'block';
+
+  const ed = data.extracted_data || {};
+  const seller = ed.seller || {};
+  const buyer = ed.buyer || {};
+  const tax = ed.tax || {};
+  const ocr = data.ocr_metadata || {};
+  const warnings = data.warnings || [];
+  const statusIcon = { success: '🟢', partial: '🟡', low_confidence: '🔴', failed: '🔴' };
+
+  el.innerHTML = `
+    <!-- Status Bar -->
+    <div style="display:flex; gap:12px; align-items:center; margin-bottom:20px; flex-wrap:wrap;">
+      <span style="font-size:0.88rem; font-weight:500;">${statusIcon[data.status] || '⚪'} ${(data.status||'').toUpperCase()}</span>
+      <span style="color:var(--text-muted);">|</span>
+      <span style="font-size:0.88rem;">Confidence: <strong>${(data.confidence_score * 100).toFixed(0)}%</strong></span>
+      <span style="color:var(--text-muted);">|</span>
+      <span style="font-size:0.88rem;">Validated: ${data.validation_passed ? '✅' : '⚠️'}</span>
+    </div>
+
+    <!-- Metrics -->
+    <div class="metrics-grid">
+      <div class="metric blue"><div class="label">Platform</div><div class="value">${(data.platform||'N/A').toUpperCase()}</div></div>
+      <div class="metric green"><div class="label">Total Amount</div><div class="value">₹${ed.total_amount ?? 'N/A'}</div></div>
+      <div class="metric yellow"><div class="label">Invoice No</div><div class="value">${ed.invoice_number || 'N/A'}</div></div>
+      <div class="metric red"><div class="label">Processing Time</div><div class="value">${data.processing_time_seconds?.toFixed(1) || '0'}s</div></div>
+    </div>
+
+    <!-- Validation Warnings -->
+    ${warnings.length > 0 ? `
+      <div class="warning-list">
+        ${warnings.map(w => `<div class="warning-item warn">⚠️ ${w}</div>`).join('')}
+      </div>
+    ` : `<div class="warning-item ok" style="margin-bottom:16px;">✅ All validations passed</div>`}
+
+    <!-- Detail Grid -->
+    <div class="result-grid">
+      <div>
+        <div class="field-group">
+          <h3>📋 Invoice Details</h3>
+          ${fieldRow('Order ID', ed.order_id)}
+          ${fieldRow('Date', ed.invoice_date)}
+          ${fieldRow('Place of Supply', ed.place_of_supply)}
+          ${fieldRow('Payment', ed.payment_method)}
+          ${fieldRow('Fields Extracted', `${ed.fields_extracted || 0} / ${ed.fields_total || 16}`)}
+        </div>
+        <div class="field-group">
+          <h3>🏪 Seller</h3>
+          ${fieldRow('Name', seller.name)}
+          ${fieldRow('GSTIN', seller.gstin)}
+          ${fieldRow('PAN', seller.pan)}
+          ${fieldRow('State', seller.state)}
+        </div>
+        <div class="field-group">
+          <h3>👤 Buyer</h3>
+          ${fieldRow('Name', buyer.name)}
+          ${fieldRow('Address', buyer.address)}
+          ${fieldRow('Phone', buyer.phone)}
+        </div>
+      </div>
+      <div>
+        <div class="field-group">
+          <h3>💰 Amounts</h3>
+          ${fieldRow('Subtotal', formatAmt(ed.subtotal))}
+          ${fieldRow('Discount', formatAmt(ed.discount))}
+          ${fieldRow('Delivery', formatAmt(ed.delivery_charge))}
+          ${fieldRow('Packaging', formatAmt(ed.packaging_charge))}
+          ${fieldRow('Total', `<strong>${formatAmt(ed.total_amount)}</strong>`)}
+        </div>
+        <div class="field-group">
+          <h3>🧾 Tax Breakdown</h3>
+          ${fieldRow('CGST', formatAmt(tax.cgst_amount))}
+          ${fieldRow('SGST', formatAmt(tax.sgst_amount))}
+          ${fieldRow('IGST', formatAmt(tax.igst_amount))}
+          ${fieldRow('Total Tax', formatAmt(tax.total_tax))}
+          ${fieldRow('Tax Validated', tax.is_validated ? '✅ Yes' : '—')}
+        </div>
+        <div class="field-group">
+          <h3>🔬 OCR Metadata</h3>
+          ${fieldRow('Engine', ocr.engine_used)}
+          ${fieldRow('OCR Confidence', `${((ocr.confidence||0)*100).toFixed(1)}%`)}
+          ${fieldRow('PaddleOCR Regions', ocr.paddle_regions)}
+          ${fieldRow('EasyOCR Regions', ocr.easy_regions)}
+          ${fieldRow('Merged Regions', ocr.merged_regions)}
+          ${fieldRow('LLM Fallback', ocr.fallback_used ? 'Yes' : 'No')}
+        </div>
+      </div>
+    </div>
+
+    <!-- Collapsible: Raw OCR Text -->
+    <div class="collapsible">
+      <div class="collapsible-header" onclick="toggleCollapsible(this)">
+        📝 Raw OCR Text <span class="arrow">▼</span>
+      </div>
+      <div class="collapsible-body"><pre>${escapeHtml(data.raw_text || 'No raw text')}</pre></div>
+    </div>
+
+    <!-- Collapsible: Full JSON -->
+    <div class="collapsible">
+      <div class="collapsible-header" onclick="toggleCollapsible(this)">
+        📋 Full JSON Response <span class="arrow">▼</span>
+      </div>
+      <div class="collapsible-body"><pre>${escapeHtml(JSON.stringify(data, null, 2))}</pre></div>
+    </div>
+
+    <!-- Download Buttons -->
+    <div style="display:flex; gap:12px; margin-top:20px;">
+      <button class="btn" onclick="downloadCSV([lastResult])">📥 Download CSV</button>
+      <button class="btn" onclick="downloadJSON(lastResult)">📥 Download JSON</button>
+    </div>
+  `;
+}
+
+function fieldRow(key, val) {
+  if (val === null || val === undefined || val === '') return '';
+  return `<div class="field-row"><span class="key">${key}</span><span class="val">${val}</span></div>`;
+}
+function formatAmt(v) { return v != null ? `₹${v}` : '—'; }
+function escapeHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function toggleCollapsible(header) {
+  header.classList.toggle('open');
+  header.nextElementSibling.classList.toggle('open');
+}
+
+// ── BATCH PROCESSING ──────────────────────────────────────────────────
+const batchFileInput = document.getElementById('batchFileInput');
+batchFileInput.addEventListener('change', (e) => {
+  batchFile = e.target.files[0];
+  if (batchFile) showFilePreview(batchFile, 'batchFilePreview');
+  document.getElementById('batchBtn').disabled = !batchFile;
+});
+
+async function startBatch() {
+  if (!batchFile) return;
+
+  const btn = document.getElementById('batchBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Processing...';
+
+  const formData = new FormData();
+  formData.append('file', batchFile);
+
+  try {
+    const r = await fetch(`${API}/api/v2/batch/process`, { method: 'POST', body: formData });
+    const batch = await r.json();
+
+    if (!r.ok) { alert(batch.detail || 'Batch failed'); return; }
+
+    const batchId = batch.batch_id;
+    const total = batch.total_files;
+    const progEl = document.getElementById('batchProgress');
+    progEl.style.display = 'block';
+    progEl.innerHTML = `<div style="font-size:0.88rem; margin-bottom:8px;">Processing ${total} files...</div><div class="progress-bar"><div class="fill" id="batchFill" style="width:0%"></div></div><div id="batchStatus" style="font-size:0.82rem; color:var(--text-muted);"></div>`;
+
+    // Poll
+    while (true) {
+      await new Promise(r => setTimeout(r, 2000));
+      const sr = await fetch(`${API}/api/v2/batch/status/${batchId}`);
+      const status = await sr.json();
+      const pct = ((status.completed + status.failed) / total * 100).toFixed(0);
+      document.getElementById('batchFill').style.width = `${pct}%`;
+      document.getElementById('batchStatus').textContent = `${status.completed}/${total} done, ${status.failed} failed`;
+
+      if (status.status === 'completed') {
+        renderBatchResults(status.results || []);
+        history.push(...(status.results || []));
+        renderHistory();
+        break;
+      }
+    }
+  } catch (err) {
+    alert(`Batch error: ${err.message}`);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '🚀 Process Batch';
+  }
+}
+
+function renderBatchResults(results) {
+  const el = document.getElementById('batchResults');
+  if (!results.length) { el.innerHTML = '<p style="color:var(--text-muted);">No results.</p>'; return; }
+
+  let rows = results.map((r, i) => {
+    const ed = r.extracted_data || {};
+    return `<tr>
+      <td>${i+1}</td>
+      <td>${(r.platform||'').toUpperCase()}</td>
+      <td>${ed.invoice_number || 'N/A'}</td>
+      <td>₹${ed.total_amount ?? 'N/A'}</td>
+      <td>${((r.confidence_score||0)*100).toFixed(0)}%</td>
+      <td>${r.validation_passed ? '✅' : '⚠️'}</td>
+      <td>${r.processing_time_seconds?.toFixed(1) || '0'}s</td>
+    </tr>`;
+  }).join('');
+
+  el.innerHTML = `
+    <table class="data-table">
+      <thead><tr><th>#</th><th>Platform</th><th>Invoice</th><th>Total</th><th>Conf</th><th>Valid</th><th>Time</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <button class="btn" style="margin-top:16px;" onclick="downloadCSV(${JSON.stringify(results).replace(/"/g, '&quot;')})">📥 Download All CSV</button>
+  `;
+}
+
+// ── CHAT ──────────────────────────────────────────────────────────────
+function updateChatInfo() {
+  const el = document.getElementById('chatDocInfo');
+  if (lastResult) {
+    const ed = lastResult.extracted_data || {};
+    el.textContent = `Chatting about: ${ed.invoice_number || 'Unknown'} (${(lastResult.platform||'').toUpperCase()})`;
+  }
+}
+
+async function sendChat() {
+  const input = document.getElementById('chatInput');
+  const q = input.value.trim();
+  if (!q) return;
+  input.value = '';
+
+  addChatMsg(q, 'user');
+
+  if (!lastResult) { addChatMsg('Please extract a document first.', 'bot'); return; }
+
+  const ed = lastResult.extracted_data || {};
+  const seller = ed.seller || {};
+  const tax = ed.tax || {};
+
+  // Try Ollama first
+  let answer = null;
+  try {
+    const context = `Invoice: ${ed.invoice_number}, Order: ${ed.order_id}, Date: ${ed.invoice_date}, Seller: ${seller.name}, GSTIN: ${seller.gstin}, Subtotal: ${ed.subtotal}, CGST: ${tax.cgst_amount}, SGST: ${tax.sgst_amount}, IGST: ${tax.igst_amount}, Total Tax: ${tax.total_tax}, Discount: ${ed.discount}, Delivery: ${ed.delivery_charge}, Total: ${ed.total_amount}, Payment: ${ed.payment_method}. Raw text: ${(lastResult.raw_text||'').slice(0,1000)}`;
+    const r = await fetch('http://localhost:11434/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'mistral',
+        prompt: `You are a financial document assistant. Answer using ONLY this context. Be specific.\n\nCONTEXT: ${context}\n\nQUESTION: ${q}\n\nANSWER:`,
+        stream: false,
+        options: { temperature: 0.1 }
+      }),
+      signal: AbortSignal.timeout(20000),
+    });
+    if (r.ok) answer = (await r.json()).response;
+  } catch {}
+
+  // Fallback: keyword matching
+  if (!answer) {
+    const ql = q.toLowerCase();
+    if (ql.includes('total') && (ql.includes('amount') || ql.includes('grand'))) answer = `Total amount: ₹${ed.total_amount ?? 'not found'}`;
+    else if (ql.includes('invoice') && ql.includes('number')) answer = `Invoice number: ${ed.invoice_number || 'not found'}`;
+    else if (ql.includes('gstin')) answer = `GSTIN: ${seller.gstin || 'not found'}`;
+    else if (ql.includes('seller') || ql.includes('sold by')) answer = `Seller: ${seller.name || 'not found'}`;
+    else if (ql.includes('tax')) answer = `CGST: ₹${tax.cgst_amount??'N/A'}, SGST: ₹${tax.sgst_amount??'N/A'}, IGST: ₹${tax.igst_amount??'N/A'}, Total Tax: ₹${tax.total_tax??'N/A'}`;
+    else if (ql.includes('date')) answer = `Date: ${ed.invoice_date || 'not found'}`;
+    else if (ql.includes('payment')) answer = `Payment: ${ed.payment_method || 'not found'}`;
+    else answer = `Platform: ${lastResult.platform}, Total: ₹${ed.total_amount}, Date: ${ed.invoice_date}, Seller: ${seller.name}. Ask about specific fields.`;
+  }
+
+  addChatMsg(answer, 'bot');
+}
+
+function addChatMsg(text, role) {
+  const el = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = `chat-msg ${role}`;
+  div.textContent = text;
+  el.appendChild(div);
+  el.scrollTop = el.scrollHeight;
+}
+
+// ── HISTORY ───────────────────────────────────────────────────────────
+function renderHistory() {
+  const el = document.getElementById('historyTable');
+  if (!history.length) { el.innerHTML = '<p style="color:var(--text-muted); text-align:center; padding:32px;">No extractions yet.</p>'; return; }
+
+  let rows = history.map((r, i) => {
+    const ed = r.extracted_data || {};
+    return `<tr>
+      <td>${i+1}</td>
+      <td>${(r.platform||'').toUpperCase()}</td>
+      <td>${ed.invoice_number || 'N/A'}</td>
+      <td>₹${ed.total_amount ?? 'N/A'}</td>
+      <td>${ed.invoice_date || ''}</td>
+      <td>${((r.confidence_score||0)*100).toFixed(0)}%</td>
+      <td>${r.validation_passed ? '✅' : '⚠️'}</td>
+    </tr>`;
+  }).join('');
+
+  el.innerHTML = `
+    <table class="data-table">
+      <thead><tr><th>#</th><th>Platform</th><th>Invoice</th><th>Total</th><th>Date</th><th>Conf</th><th>Valid</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  `;
+}
+
+// ── DOWNLOAD ──────────────────────────────────────────────────────────
+function downloadCSV(results) {
+  if (!results || !results.length) return;
+
+  const headers = ['Platform','Invoice Number','Order ID','Date','Seller','GSTIN','Buyer','Subtotal','CGST','SGST','IGST','Total Tax','Discount','Delivery','Total','Payment','Confidence','Validated'];
+  let csv = headers.join(',') + '\n';
+
+  for (const r of results) {
+    const ed = r.extracted_data || {};
+    const s = ed.seller || {};
+    const b = ed.buyer || {};
+    const t = ed.tax || {};
+    csv += [
+      r.platform, ed.invoice_number||'', ed.order_id||'', ed.invoice_date||'',
+      `"${(s.name||'').replace(/"/g,'""')}"`, s.gstin||'', `"${(b.name||'').replace(/"/g,'""')}"`,
+      ed.subtotal||'', t.cgst_amount||'', t.sgst_amount||'', t.igst_amount||'', t.total_tax||'',
+      ed.discount||'', ed.delivery_charge||'', ed.total_amount||'', ed.payment_method||'',
+      ((r.confidence_score||0)*100).toFixed(0)+'%', r.validation_passed?'Yes':'No',
+    ].join(',') + '\n';
+  }
+
+  downloadBlob(csv, `invoices_${Date.now()}.csv`, 'text/csv');
+}
+
+function downloadJSON(data) {
+  downloadBlob(JSON.stringify(data, null, 2), `invoice_${(data.extracted_data||{}).invoice_number||'result'}.json`, 'application/json');
+}
+
+function downloadAllCSV() { downloadCSV(history); }
+
+function downloadBlob(content, filename, type) {
+  const blob = new Blob([content], { type });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+</script>
+</body>
+</html>

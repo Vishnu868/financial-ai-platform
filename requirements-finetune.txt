@@ -1,0 +1,24 @@
+# ══════════════════════════════════════════════════════════════════════════════
+# Fine-Tuning Dependencies — ONLY install on GPU machine (RTX 3050+)
+# Install: pip install -r requirements-finetune.txt
+# ══════════════════════════════════════════════════════════════════════════════
+
+# PyTorch with CUDA (install separately if needed)
+# pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
+torch>=2.1.0
+torchvision>=0.16.0
+
+# HuggingFace Transformers
+transformers>=4.37.0
+datasets>=2.16.0
+accelerate>=0.26.0
+
+# LoRA / PEFT
+peft>=0.8.0
+
+# 4-bit quantization
+bitsandbytes>=0.42.0
+
+# Tokenizers
+sentencepiece>=0.1.99
+protobuf>=3.20.0
